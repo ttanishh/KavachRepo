@@ -1,4 +1,5 @@
 // components/common/Map.jsx
+'use client'
 import React, { useEffect, useRef } from 'react';
 
 export function Map({

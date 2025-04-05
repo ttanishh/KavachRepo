@@ -1,6 +1,97 @@
 @import "tailwindcss";
 
+@theme {
+  /* Core Colors */
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* Primary Colors */
+  --color-primary-50: #E6F5FF;
+  --color-primary-100: #CCE8FF;
+  --color-primary-200: #99D1FF;
+  --color-primary-300: #66BAFF;
+  --color-primary-400: #3393FF;
+  --color-primary-500: #0070F3; /* Main brand color */
+  --color-primary-600: #005ACC;
+  --color-primary-700: #0046A6;
+  --color-primary-800: #003380;
+  --color-primary-900: #00204D;
+
+  /* Secondary Colors */
+  --color-secondary-50: #F0F7FF;
+  --color-secondary-100: #E6F0FE;
+  --color-secondary-200: #C8E1FD;
+  --color-secondary-300: #A1CCFB;
+  --color-secondary-400: #79B7F9;
+  --color-secondary-500: #5096F7;
+  --color-secondary-600: #3A75C5;
+  --color-secondary-700: #295694;
+  --color-secondary-800: #183862;
+  --color-secondary-900: #0C1D31;
+
+  /* Accent Colors */
+  --color-accent-50: #FFF0EB;
+  --color-accent-100: #FFE0D6;
+  --color-accent-200: #FFC1AD;
+  --color-accent-300: #FFA285;
+  --color-accent-400: #FF835C;
+  --color-accent-500: #FF5533;
+  --color-accent-600: #CC4429;
+  --color-accent-700: #99331F;
+  --color-accent-800: #662214;
+  --color-accent-900: #33110A;
+
+  /* Semantic Colors */
+  --color-success-500: #00C365;
+  --color-warning-500: #FFC000;
+  --color-error-500: #FA0707;
+  --color-info-500: #3399FF;
+
+  /* Neutral Colors */
+  --color-surface-50: #F9FAFB;
+  --color-surface-100: #F1F5F9;
+  --color-surface-200: #E2E8F0;
+  --color-surface-300: #CBD5E1;
+  --color-surface-400: #94A3B8;
+  --color-surface-500: #64748B;
+  --color-surface-600: #475569;
+  --color-surface-700: #334155;
+  --color-surface-800: #1E293B;
+  --color-surface-900: #0F172A;
+
+  /* Typography */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+  /* Spacing Scale */
+  --spacing-0: 0px;
+  --spacing-1: 0.25rem; /* 4px */
+  --spacing-2: 0.5rem; /* 8px */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-4: 1rem; /* 16px */
+  --spacing-5: 1.25rem; /* 20px */
+  --spacing-6: 1.5rem; /* 24px */
+  --spacing-8: 2rem; /* 32px */
+  --spacing-10: 2.5rem; /* 40px */
+  --spacing-12: 3rem; /* 48px */
+  --spacing-16: 4rem; /* 64px */
+
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-sm: 0.125rem; /* 2px */
+  --radius-md: 0.25rem; /* 4px */
+  --radius-lg: 0.5rem; /* 8px */
+  --radius-xl: 0.75rem; /* 12px */
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
 :root {
+  /* Legacy CSS variables for compatibility */
   /* Core Colors */
   --background: #ffffff;
   --foreground: #171717;
@@ -58,64 +149,14 @@
   --surface-700: #334155;
   --surface-800: #1E293B;
   --surface-900: #0F172A;
-
-  /* Typography */
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'Roboto Mono', monospace;
-
-  /* Font Sizes */
-  --text-xs: 0.75rem; /* 12px */
-  --text-sm: 0.875rem; /* 14px */
-  --text-base: 1rem; /* 16px */
-  --text-lg: 1.125rem; /* 18px */
-  --text-xl: 1.25rem; /* 20px */
-  --text-2xl: 1.5rem; /* 24px */
-  --text-3xl: 1.875rem; /* 30px */
-  --text-4xl: 2.25rem; /* 36px */
-  --text-5xl: 3rem; /* 48px */
-  --text-6xl: 3.75rem; /* 60px */
-
-  /* Line Heights */
-  --leading-none: 1;
-  --leading-tight: 1.25;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.625;
-
-  /* Spacing */
-  --space-0: 0px;
-  --space-1: 0.25rem; /* 4px */
-  --space-2: 0.5rem; /* 8px */
-  --space-3: 0.75rem; /* 12px */
-  --space-4: 1rem; /* 16px */
-  --space-5: 1.25rem; /* 20px */
-  --space-6: 1.5rem; /* 24px */
-  --space-8: 2rem; /* 32px */
-  --space-10: 2.5rem; /* 40px */
-  --space-12: 3rem; /* 48px */
-  --space-16: 4rem; /* 64px */
-
-  /* Border Radius */
-  --radius-none: 0px;
-  --radius-sm: 0.125rem; /* 2px */
-  --radius-md: 0.25rem; /* 4px */
-  --radius-lg: 0.5rem; /* 8px */
-  --radius-xl: 0.75rem; /* 12px */
-  --radius-full: 9999px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
+  @theme {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+  
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;

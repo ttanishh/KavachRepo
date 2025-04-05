@@ -1,46 +1,39 @@
-// components/common/Tabs.jsx
-import React, { useState } from 'react';
-
-export function Tabs({
-  tabs = [],
-  defaultTab = 0,
-  onChange,
-  className = '',
-  ...props
-}) {
-  const [activeTab, setActiveTab] = useState(defaultTab);
-  
-  const handleTabClick = (index) => {
-    setActiveTab(index);
-    if (onChange) {
-      onChange(index);
-    }
-  };
-  
+// Tabs Components for direct use in auth/login/page.jsx
+function Tabs({ children, className = "" }) {
   return (
-    <div className={`space-y-4 ${className}`} {...props}>
-      <div className="border-b border-surface-200">
-        <nav className="-mb-px flex space-x-8">
-          {tabs.map((tab, index) => (
-            <button
-              key={index}
-              className={`
-                whitespace-nowrap py-4 px-1 border-b-2 text-sm font-medium transition-colors
-                ${activeTab === index 
-                  ? 'border-primary-500 text-primary-600' 
-                  : 'border-transparent text-surface-600 hover:text-surface-700 hover:border-surface-300'}
-              `}
-              onClick={() => handleTabClick(index)}
-              aria-current={activeTab === index ? 'page' : undefined}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-      <div>
-        {tabs[activeTab]?.content}
-      </div>
+    <div className={`${className}`}>
+      {children}
     </div>
   );
+}
+
+function TabsList({ children, className = "" }) {
+  return (
+    <div className={`grid grid-cols-3 gap-1 p-1 bg-gray-100 rounded-lg ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function TabsTrigger({ children, value, currentValue, onValueChange, className = "" }) {
+  const isActive = value === currentValue;
+  
+  return (
+    <button
+      type="button"
+      className={`py-2 text-sm font-medium rounded-md transition-colors ${
+        isActive
+          ? 'bg-white shadow-sm text-blue-600'
+          : 'text-gray-500 hover:text-gray-700'
+      } ${className}`}
+      onClick={() => onValueChange(value)}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TabsContent({ children, value, currentValue, className = "" }) {
+  if (value !== currentValue) return null;
+  return <div className={className}>{children}</div>;
 }

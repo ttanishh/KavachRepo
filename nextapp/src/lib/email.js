@@ -1,49 +1,47 @@
-import nodemailer from 'nodemailer';
-
 /**
- * Initialize the Nodemailer transporter
- * @returns {Object} Nodemailer transporter instance
+ * Send an email
+ * This is a mock implementation for development
+ * 
+ * @param {string} to - Recipient email address
+ * @param {string} subject - Email subject
+ * @param {string} body - Email content
+ * @returns {Promise<Object>} Result object
  */
-const initTransporter = () => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST, 
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE === 'true', 
-    auth: {
-      user: process.env.SMTP_USER, // SMTP username
-      pass: process.env.SMTP_PASS, // SMTP password
-    },
-  });
-
-  return transporter;
+export const sendEmail = async (to, subject, body) => {
+  console.log(`[EMAIL MOCK] Sending email to: ${to}`);
+  console.log(`[EMAIL MOCK] Subject: ${subject}`);
+  console.log(`[EMAIL MOCK] Body: ${body}`);
+  
+  return {
+    success: true,
+    messageId: `mock-${Date.now()}`
+  };
 };
 
 /**
- * Send an email using Nodemailer
+ * Send a welcome email to a new user
+ * 
  * @param {string} to - Recipient email address
- * @param {string} subject - Email subject
- * @param {string} text - Plain text email content
- * @param {string} [html] - Optional HTML email content
- * @returns {Promise<Object>} Result object with success status
+ * @param {string} name - User's name
+ * @returns {Promise<Object>} Result object
  */
-export const sendEmail = async (to, subject, text, html = null) => {
-  try {
-    const transporter = initTransporter();
+export const sendWelcomeEmail = async (to, name) => {
+  const subject = 'Welcome to Kavach';
+  const body = `Hello ${name || 'there'},\n\nWelcome to Kavach! We're glad to have you on board.\n\nRegards,\nThe Kavach Team`;
+  
+  return sendEmail(to, subject, body);
+};
 
-    const mailOptions = {
-      from: process.env.SMTP_FROM, // Sender address (e.g., "no-reply@kavach.com")
-      to,
-      subject,
-      text,
-      ...(html && { html }), // Include HTML content if provided
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log(`Email sent successfully: ${info.messageId}`);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return { success: false, error: error.message || 'Failed to send email' };
-  }
+/**
+ * Send a verification code via email
+ * 
+ * @param {string} to - Recipient email address
+ * @param {string} code - Verification code
+ * @returns {Promise<Object>} Result object
+ */
+export const sendVerificationCode = async (to, code) => {
+  const subject = 'Your Kavach Verification Code';
+  const body = `Your verification code is: ${code}\n\nThis code will expire in 10 minutes.`;
+  
+  return sendEmail(to, subject, body);
 };

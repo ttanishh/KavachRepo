@@ -15,7 +15,7 @@ const superAdminConverter = {
     return {
       name: superAdmin.name,
       email: superAdmin.email,
-      password: superAdmin.password, // Note: In production, never store passwords in Firestore
+      password: superAdmin.password,
       createdAt: dateToTimestamp(superAdmin.createdAt)
     };
   },
@@ -31,8 +31,11 @@ const superAdminConverter = {
   }
 };
 
-// Collection and document references
-const superAdmins = (db) => collection(db, 'superAdmins').withConverter(superAdminConverter);
-const superAdminDoc = (db, id) => doc(db, 'superAdmins', id).withConverter(superAdminConverter);
+// Collection reference
+const superAdminsCollection = 'superAdmins';
 
-export { superAdmins, superAdminDoc, superAdminConverter };
+// Helper functions that return the actual reference
+const superAdmins = (db) => collection(db, superAdminsCollection);
+const superAdminDoc = (db, id) => id ? doc(db, superAdminsCollection, id) : doc(collection(db, superAdminsCollection));
+
+export { superAdmins, superAdminDoc, superAdminConverter, superAdminsCollection };

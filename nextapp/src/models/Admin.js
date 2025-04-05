@@ -34,8 +34,11 @@ const adminConverter = {
   }
 };
 
-// Collection and document references
-const admins = (db) => collection(db, 'admins').withConverter(adminConverter);
-const adminDoc = (db, id) => doc(db, 'admins', id).withConverter(adminConverter);
+// Collection reference
+const adminsCollection = 'admins';
 
-export { admins, adminDoc, adminConverter };
+// Helper functions that return the actual reference
+const admins = (db) => collection(db, adminsCollection);
+const adminDoc = (db, id) => id ? doc(db, adminsCollection, id) : doc(collection(db, adminsCollection));
+
+export { admins, adminDoc, adminConverter, adminsCollection };

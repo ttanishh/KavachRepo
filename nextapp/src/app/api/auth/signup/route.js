@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { db } from '@/lib/firebase';
+import { db, setDoc } from '@/lib/firebase';
 import { userDoc } from '@/models/User';
 import { adminDoc } from '@/models/Admin';
 import { superAdminDoc } from '@/models/SuperAdmin';
+import { serverTimestamp } from 'firebase/firestore';
 import { sendEmail } from '@/lib/email';
 import { sendVerificationCode } from '@/lib/sms';
 import { generateToken } from '@/lib/jwt';
@@ -11,24 +12,39 @@ import { generateToken } from '@/lib/jwt';
 export async function POST(request) {
   try {
     const { 
-      email, 
-      password, 
-      name, 
-      username, 
-      phone, 
-      role,
+      userData,
+      role = 'user',
       isEmergencyUser = false
     } = await request.json();
 
     // Basic validation
-    if (!email || !password || !role && !isEmergencyUser) {
+    if (!userData) {
       return NextResponse.json(
-        { success: false, error: 'Email, password, and role are required' },
+        { success: false, error: 'User data is required' },
         { status: 400 }
       );
     }
 
-    // For emergency users, only minimal validation is needed
+    // Extract user data
+    const { email, password, name, username, phone, fullName } = userData;
+
+    // For non-emergency users, email and password are required
+    if (!isEmergencyUser && (!email || !password)) {
+      return NextResponse.json(
+        { success: false, error: 'Email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    // For emergency users, phone is required
+    if (isEmergencyUser && !phone) {
+      return NextResponse.json(
+        { success: false, error: 'Phone number is required for emergency users' },
+        { status: 400 }
+      );
+    }
+
+    // For regular users, username is required
     if (role === 'user' && !isEmergencyUser && !username) {
       return NextResponse.json(
         { success: false, error: 'Username is required for standard user accounts' },
@@ -44,14 +60,17 @@ export async function POST(request) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash password for non-emergency users
+    let hashedPassword = null;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
     
     // Handle different roles
     let docRef;
     let userId;
     let token;
-    let userData = {};
+    let responseData = {};
     
     switch (role) {
       case 'user':
@@ -59,70 +78,78 @@ export async function POST(request) {
         const actualUsername = username || `emergency_${Date.now()}`;
         
         // Create user document with emergency flag if applicable
-        docRef = userDoc(db, email);
-        await docRef.set({
-          username: actualUsername,
-          email,
-          password: hashedPassword,
-          fullName: name || null,
-          phone: phone || null,
-          isActive: true, // Even emergency accounts should be active immediately
-          isEmergencyUser: isEmergencyUser,
-          createdAt: new Date(),
-          lastLogin: null
-        });
-        
-        // Get the document ID
+        docRef = userDoc(db, isEmergencyUser ? null : email); // Use null for emergencies to get auto ID
         userId = docRef.id;
         
+        // Use setDoc instead of docRef.set
+        await setDoc(docRef, {
+          username: actualUsername,
+          email: email || null,
+          password: hashedPassword,
+          fullName: fullName || name || null,
+          phone: phone || null,
+          isActive: true,
+          isEmergencyUser: isEmergencyUser,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
+        });
+        
         // Generate JWT token
-        token = generateToken({
+        token = await generateToken({
           id: userId,
-          email,
+          email: email || null,
+          username: actualUsername,
           role: 'user',
           isEmergencyUser
         });
         
-        userData = {
+        responseData = {
           id: userId,
-          email,
+          email: email || null,
           username: actualUsername,
-          fullName: name || null,
+          fullName: fullName || name || null,
+          phone: phone || null,
           isEmergencyUser
         };
         
-        // Send welcome email (even for emergency users)
-        await sendEmail(
-          email,
-          isEmergencyUser ? 'Kavach Emergency Account Created' : 'Welcome to Kavach',
-          `Hello${name ? ' ' + name : ''},\n\n${isEmergencyUser ? 'Your emergency account has been created. Please complete your profile when safe to do so.' : 'Thank you for creating an account with Kavach.'}\n\nYour safety is our priority.\n\nRegards,\nThe Kavach Team`
-        );
+        // Send welcome email for non-emergency users with email
+        if (email && !isEmergencyUser) {
+          try {
+            await sendEmail(
+              email,
+              'Welcome to Kavach',
+              `Hello${fullName ? ' ' + fullName : ''},\n\nThank you for creating an account with Kavach. Your safety is our priority.\n\nRegards,\nThe Kavach Team`
+            );
+          } catch (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+            // Don't fail the registration if email sending fails
+          }
+        }
         
         break;
         
       case 'admin':
         docRef = adminDoc(db, email);
-        await docRef.set({
+        userId = docRef.id;
+        
+        await setDoc(docRef, {
           name,
           email,
           phoneNumber: phone,
           password: hashedPassword,
-          createdAt: new Date(),
-          lastLogin: null
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
         });
         
-        // Get the document ID
-        userId = docRef.id;
-        
         // Generate JWT token
-        token = generateToken({
+        token = await generateToken({
           id: userId,
           email,
           role: 'admin',
           name
         });
         
-        userData = {
+        responseData = {
           id: userId,
           email,
           name,
@@ -130,37 +157,42 @@ export async function POST(request) {
         };
         
         // Send welcome email to admin
-        await sendEmail(
-          email,
-          'Kavach Admin Account Created',
-          `Hello ${name},\n\nYour Kavach admin account has been created successfully. You now have access to the admin dashboard.\n\nRegards,\nThe Kavach Team`
-        );
+        if (email) {
+          try {
+            await sendEmail(
+              email,
+              'Kavach Admin Account Created',
+              `Hello ${name},\n\nYour Kavach admin account has been created successfully. You now have access to the admin dashboard.\n\nRegards,\nThe Kavach Team`
+            );
+          } catch (emailError) {
+            console.error('Failed to send admin welcome email:', emailError);
+          }
+        }
         
         break;
         
       case 'superAdmin':
         docRef = superAdminDoc(db, email);
-        await docRef.set({
+        userId = docRef.id;
+        
+        await setDoc(docRef, {
           name,
           email,
           phoneNumber: phone,
           password: hashedPassword,
-          createdAt: new Date(),
-          lastLogin: null
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
         });
         
-        // Get the document ID
-        userId = docRef.id;
-        
         // Generate JWT token
-        token = generateToken({
+        token = await generateToken({
           id: userId,
           email,
           role: 'superAdmin',
           name
         });
         
-        userData = {
+        responseData = {
           id: userId,
           email,
           name,
@@ -168,11 +200,17 @@ export async function POST(request) {
         };
         
         // Send welcome email to superadmin
-        await sendEmail(
-          email,
-          'Kavach Super Admin Account Created',
-          `Hello ${name},\n\nYour Kavach super admin account has been created successfully. You now have full administrative access to the platform.\n\nRegards,\nThe Kavach Team`
-        );
+        if (email) {
+          try {
+            await sendEmail(
+              email,
+              'Kavach Super Admin Account Created',
+              `Hello ${name},\n\nYour Kavach super admin account has been created successfully. You now have full administrative access to the platform.\n\nRegards,\nThe Kavach Team`
+            );
+          } catch (emailError) {
+            console.error('Failed to send superadmin welcome email:', emailError);
+          }
+        }
         
         break;
         
@@ -184,13 +222,26 @@ export async function POST(request) {
     }
 
     // Success response with token
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: `${role} account created successfully`,
       isEmergencyUser: isEmergencyUser || false,
-      user: userData,
-      token: token
+      user: responseData,
+      token
     }, { status: 201 });
+    
+    // Set secure HTTP-only cookie
+    response.cookies.set({
+      name: 'auth_token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 86400 // 24 hours
+    });
+    
+    return response;
     
   } catch (error) {
     console.error('Signup error:', error);

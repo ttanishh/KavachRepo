@@ -1,4 +1,5 @@
 // components/a/AssignedReportsTable.jsx
+'use client'
 import React, { useState } from 'react';
 import { Table } from '../common/Table';
 import { StatusBadge } from '../common/StatusBadge';

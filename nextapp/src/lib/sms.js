@@ -2,7 +2,7 @@
 let twilioClient;
 
 /**
- * Initialize the Twilio client (called once on server startup)
+ * Initialize the Twilio client
  * @returns {Object} Twilio client instance
  */
 const initTwilioClient = () => {
@@ -16,9 +16,15 @@ const initTwilioClient = () => {
       return null;
     }
     
-    // Import Twilio SDK (only on server-side)
-    const twilio = require('twilio');
-    twilioClient = twilio(accountSid, authToken);
+    try {
+      // Import Twilio SDK
+      const twilio = require('twilio');
+      twilioClient = twilio(accountSid, authToken);
+      console.log('Twilio client initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize Twilio client:', error);
+      return null;
+    }
   }
   
   return twilioClient;
@@ -32,6 +38,15 @@ const initTwilioClient = () => {
  */
 export const sendSMS = async (to, body) => {
   try {
+    // Validate parameters
+    if (!to) {
+      throw new Error('Phone number is required');
+    }
+    
+    if (!body) {
+      throw new Error('Message body is required');
+    }
+    
     const client = initTwilioClient();
     
     if (!client) {
@@ -46,7 +61,7 @@ export const sendSMS = async (to, body) => {
     // Format the phone number if needed
     const formattedTo = to.startsWith('+') ? to : `+${to}`;
     
-    // Send the message
+    // Send the message - always send the real SMS
     const message = await client.messages.create({
       body,
       from,
@@ -73,6 +88,40 @@ export const sendSMS = async (to, body) => {
 export const sendVerificationCode = async (phoneNumber, code) => {
   const message = `Your Kavach verification code is: ${code}. This code will expire in 10 minutes.`;
   return sendSMS(phoneNumber, message);
+};
+
+/**
+ * Send emergency OTP for authentication
+ * @param {string} phoneNumber - Phone number to send OTP to
+ * @param {string} otp - OTP code to send
+ * @returns {Promise<Object>} Result object with success status
+ */
+export const sendEmergencyOTP = async (phoneNumber, otp) => {
+  if (!phoneNumber) {
+    console.error('Phone number is required for sending OTP');
+    return { 
+      success: false, 
+      error: 'Phone number is required',
+    };
+  }
+  
+  if (!otp) {
+    console.error('OTP is required for sending');
+    return { 
+      success: false, 
+      error: 'OTP is required',
+    };
+  }
+  
+  console.log(`Sending emergency OTP ${otp} to ${phoneNumber}`);
+  
+  const message = `EMERGENCY: Your Kavach verification code is: ${otp}. This code will expire in 10 minutes.`;
+  const result = await sendSMS(phoneNumber, message);
+  
+  return {
+    ...result,
+    phoneNumber
+  };
 };
 
 /**

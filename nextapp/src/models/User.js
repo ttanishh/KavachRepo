@@ -12,6 +12,8 @@ import { dateToTimestamp } from './utils';
  * @property {boolean} isEmergencyUser
  * @property {Date} createdAt
  * @property {Date} [lastLogin]
+ * @property {string} [otp] - One-time password for verification
+ * @property {Date} [otpExpiresAt] - OTP expiration timestamp
  */
 
 const userConverter = {
@@ -24,7 +26,9 @@ const userConverter = {
       isActive: user.isActive,
       isEmergencyUser: user.isEmergencyUser || false,
       createdAt: dateToTimestamp(user.createdAt),
-      lastLogin: dateToTimestamp(user.lastLogin)
+      lastLogin: dateToTimestamp(user.lastLogin),
+      otp: user.otp || null,
+      otpExpiresAt: dateToTimestamp(user.otpExpiresAt)
     };
   },
   fromFirestore: (snapshot, options) => {
@@ -38,13 +42,18 @@ const userConverter = {
       isActive: data.isActive,
       isEmergencyUser: data.isEmergencyUser || false,
       createdAt: data.createdAt?.toDate(),
-      lastLogin: data.lastLogin?.toDate()
+      lastLogin: data.lastLogin?.toDate(),
+      otp: data.otp,
+      otpExpiresAt: data.otpExpiresAt?.toDate()
     };
   }
 };
 
-// Collection and document references
-const users = (db) => collection(db, 'users').withConverter(userConverter);
-const userDoc = (db, id) => doc(db, 'users', id).withConverter(userConverter);
+// Collection reference
+const usersCollection = 'users';
 
-export { users, userDoc, userConverter };
+// Helper functions that return the actual reference
+const users = (db) => collection(db, usersCollection);
+const userDoc = (db, id) => id ? doc(db, usersCollection, id) : doc(collection(db, usersCollection));
+
+export { users, userDoc, userConverter, usersCollection };

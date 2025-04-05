@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { db } from '@/lib/firebase';
-import { userDoc } from '@/models/User';
+import { db, getDoc } from '@/lib/firebase';  // Add getDoc to imports
+import { userDoc, users } from '@/models/User';
 import { adminDoc } from '@/models/Admin';
 import { superAdminDoc } from '@/models/SuperAdmin';
-import { collection, getDocs, query, where } from '@/lib/firebase';
+import { collection, getDocs, query, where, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { generateToken } from '@/lib/jwt';
 
 export async function POST(request) {
   try {
@@ -24,14 +25,17 @@ export async function POST(request) {
 
     let userData;
     let docRef;
+    let userId;
+    let token;
 
     // Handle different roles
     switch (role) {
       case 'user':
         docRef = userDoc(db, email);
-        userData = await docRef.get();
+        // Use getDoc instead of docRef.get()
+        const userSnapshot = await getDoc(docRef);
         
-        if (!userData.exists) {
+        if (!userSnapshot.exists()) {  // Note: exists is a function in v9
           // If this is an emergency login attempt and the user doesn't exist,
           // we could redirect to emergency signup instead of showing an error
           if (isEmergencyLogin) {
@@ -48,10 +52,11 @@ export async function POST(request) {
           );
         }
         
-        const user = userData.data();
+        userData = userSnapshot.data();
+        userId = userSnapshot.id;
         
         // Verify password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, userData.password);
         if (!isPasswordValid) {
           return NextResponse.json(
             { success: false, error: 'Invalid email or password' },
@@ -59,64 +64,99 @@ export async function POST(request) {
           );
         }
         
-        // For emergency login, set a special session flag
-        // This could trigger different app behavior or restrictions
-        const sessionData = {
-          userId: userData.id,
-          email: user.email,
-          username: user.username,
+        // Generate token with appropriate flags
+        token = await generateToken({
+          id: userId,
+          email: userData.email,
+          username: userData.username,
           role: 'user',
           isEmergencyLogin: isEmergencyLogin || false,
-          isEmergencyUser: user.isEmergencyUser || false
-        };
+          isEmergencyUser: userData.isEmergencyUser || false
+        });
         
         // Update last login time
-        await docRef.update({
-          lastLogin: new Date()
+        await updateDoc(docRef, {
+          lastLogin: serverTimestamp()
         });
         
-        return NextResponse.json({
-          success: true,
-          user: {
-            id: userData.id,
-            email: user.email,
-            username: user.username,
-            fullName: user.fullName,
-            isEmergencyUser: user.isEmergencyUser
-          },
-          isEmergencyLogin,
-          token: "jwt_token_would_go_here" // In a real app, generate a JWT
-        });
+        break;
         
-      // Admin and SuperAdmin login cases...
       case 'admin':
-        // Admin login logic
         docRef = adminDoc(db, email);
-        userData = await docRef.get();
+        // Use getDoc instead of docRef.get()
+        const adminSnapshot = await getDoc(docRef);
         
-        if (!userData.exists) {
+        if (!adminSnapshot.exists()) {  // Note: exists is a function in v9
           return NextResponse.json(
             { success: false, error: 'Invalid email or password' },
             { status: 401 }
           );
         }
         
-        // Admin-specific logic...
+        userData = adminSnapshot.data();
+        userId = adminSnapshot.id;
+        
+        // Verify password
+        const isAdminPasswordValid = await bcrypt.compare(password, userData.password);
+        if (!isAdminPasswordValid) {
+          return NextResponse.json(
+            { success: false, error: 'Invalid email or password' },
+            { status: 401 }
+          );
+        }
+        
+        // Generate token for admin
+        token = await generateToken({
+          id: userId,
+          email: userData.email,
+          name: userData.name,
+          role: 'admin'
+        });
+        
+        // Update last login time
+        await updateDoc(docRef, {
+          lastLogin: serverTimestamp()
+        });
+        
         break;
         
       case 'superAdmin':
-        // SuperAdmin login logic
         docRef = superAdminDoc(db, email);
-        userData = await docRef.get();
+        // Use getDoc instead of docRef.get()
+        const superAdminSnapshot = await getDoc(docRef);
         
-        if (!userData.exists) {
+        if (!superAdminSnapshot.exists()) {  // Note: exists is a function in v9
           return NextResponse.json(
             { success: false, error: 'Invalid email or password' },
             { status: 401 }
           );
         }
         
-        // SuperAdmin-specific logic...
+        userData = superAdminSnapshot.data();
+        userId = superAdminSnapshot.id;
+        
+        // Verify password
+        const isSuperAdminPasswordValid = await bcrypt.compare(password, userData.password);
+        if (!isSuperAdminPasswordValid) {
+          return NextResponse.json(
+            { success: false, error: 'Invalid email or password' },
+            { status: 401 }
+          );
+        }
+        
+        // Generate token for superadmin
+        token = await generateToken({
+          id: userId,
+          email: userData.email,
+          name: userData.name,
+          role: 'superAdmin'
+        });
+        
+        // Update last login time
+        await updateDoc(docRef, {
+          lastLogin: serverTimestamp()
+        });
+        
         break;
         
       default:
@@ -126,6 +166,31 @@ export async function POST(request) {
         );
     }
     
+    // Set cookie in response
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: userId,
+        ...userData,
+        password: undefined // Remove password from response
+      },
+      role,
+      isEmergencyLogin: isEmergencyLogin || false,
+      token
+    });
+    
+    // Set secure HTTP-only cookie
+    response.cookies.set({
+      name: 'auth_token',
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 86400 // 24 hours
+    });
+    
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(

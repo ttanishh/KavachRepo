@@ -1,30 +1,45 @@
 import jwt from 'jsonwebtoken';
 
-// Secret key should be in environment variables in production
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = '7d'; 
+const JWT_SECRET = process.env.JWT_SECRET || 'kavach-super-secret-jwt-key-change-in-production';
+const JWT_EXPIRES_IN = '24h';
 
 /**
- * Generate a JWT token
+ * Generate a JWT token for user authentication
+ * 
  * @param {Object} payload - Data to encode in the token
- * @returns {String} JWT token
+ * @returns {Promise<string>} - JWT token
  */
-export function generateToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN
+export const generateToken = async (payload) => {
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN },
+      (err, token) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(token);
+        }
+      }
+    );
   });
-}
+};
 
 /**
- * Verify a JWT token
- * @param {String} token - JWT token to verify
- * @returns {Object} Decoded payload if valid
- * @throws {Error} If token is invalid
+ * Verify and decode a JWT token
+ * 
+ * @param {string} token - JWT token to verify
+ * @returns {Promise<Object>} - Decoded token payload
  */
-export function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    throw new Error('Invalid token');
-  }
-}
+export const verifyToken = async (token) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
+};
