@@ -12,10 +12,10 @@ export async function POST(request) {
       email, 
       password, 
       role = 'user',
-      isEmergencyLogin = false // Special flag for emergency login
+      isEmergencyLogin = false
     } = await request.json();
 
-    if (!email || !password) {
+    if (!email || !password && !isEmergencyLogin) {
       return NextResponse.json(
         { success: false, error: 'Email and password are required' },
         { status: 400 }

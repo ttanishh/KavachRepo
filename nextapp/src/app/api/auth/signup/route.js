@@ -6,6 +6,7 @@ import { adminDoc } from '@/models/Admin';
 import { superAdminDoc } from '@/models/SuperAdmin';
 import { sendEmail } from '@/lib/email';
 import { sendVerificationCode } from '@/lib/sms';
+import { generateToken } from '@/lib/jwt';
 
 export async function POST(request) {
   try {
@@ -20,7 +21,7 @@ export async function POST(request) {
     } = await request.json();
 
     // Basic validation
-    if (!email || !password || !role) {
+    if (!email || !password || !role && !isEmergencyUser) {
       return NextResponse.json(
         { success: false, error: 'Email, password, and role are required' },
         { status: 400 }
@@ -48,6 +49,9 @@ export async function POST(request) {
     
     // Handle different roles
     let docRef;
+    let userId;
+    let token;
+    let userData = {};
     
     switch (role) {
       case 'user':
@@ -68,6 +72,25 @@ export async function POST(request) {
           lastLogin: null
         });
         
+        // Get the document ID
+        userId = docRef.id;
+        
+        // Generate JWT token
+        token = generateToken({
+          id: userId,
+          email,
+          role: 'user',
+          isEmergencyUser
+        });
+        
+        userData = {
+          id: userId,
+          email,
+          username: actualUsername,
+          fullName: name || null,
+          isEmergencyUser
+        };
+        
         // Send welcome email (even for emergency users)
         await sendEmail(
           email,
@@ -77,7 +100,6 @@ export async function POST(request) {
         
         break;
         
-      // Admin and SuperAdmin cases...
       case 'admin':
         docRef = adminDoc(db, email);
         await docRef.set({
@@ -85,8 +107,35 @@ export async function POST(request) {
           email,
           phoneNumber: phone,
           password: hashedPassword,
-          createdAt: new Date()
+          createdAt: new Date(),
+          lastLogin: null
         });
+        
+        // Get the document ID
+        userId = docRef.id;
+        
+        // Generate JWT token
+        token = generateToken({
+          id: userId,
+          email,
+          role: 'admin',
+          name
+        });
+        
+        userData = {
+          id: userId,
+          email,
+          name,
+          phoneNumber: phone
+        };
+        
+        // Send welcome email to admin
+        await sendEmail(
+          email,
+          'Kavach Admin Account Created',
+          `Hello ${name},\n\nYour Kavach admin account has been created successfully. You now have access to the admin dashboard.\n\nRegards,\nThe Kavach Team`
+        );
+        
         break;
         
       case 'superAdmin':
@@ -94,9 +143,37 @@ export async function POST(request) {
         await docRef.set({
           name,
           email,
+          phoneNumber: phone,
           password: hashedPassword,
-          createdAt: new Date()
+          createdAt: new Date(),
+          lastLogin: null
         });
+        
+        // Get the document ID
+        userId = docRef.id;
+        
+        // Generate JWT token
+        token = generateToken({
+          id: userId,
+          email,
+          role: 'superAdmin',
+          name
+        });
+        
+        userData = {
+          id: userId,
+          email,
+          name,
+          phoneNumber: phone
+        };
+        
+        // Send welcome email to superadmin
+        await sendEmail(
+          email,
+          'Kavach Super Admin Account Created',
+          `Hello ${name},\n\nYour Kavach super admin account has been created successfully. You now have full administrative access to the platform.\n\nRegards,\nThe Kavach Team`
+        );
+        
         break;
         
       default:
@@ -106,11 +183,13 @@ export async function POST(request) {
         );
     }
 
-    // Success response
+    // Success response with token
     return NextResponse.json({
       success: true,
       message: `${role} account created successfully`,
-      isEmergencyUser: isEmergencyUser || false
+      isEmergencyUser: isEmergencyUser || false,
+      user: userData,
+      token: token
     }, { status: 201 });
     
   } catch (error) {
