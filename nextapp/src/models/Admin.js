@@ -17,7 +17,7 @@ const adminConverter = {
       name: admin.name,
       email: admin.email,
       phoneNumber: admin.phoneNumber,
-      password: admin.password, // Note: In production, never store passwords in Firestore
+      password: admin.password, 
       createdAt: dateToTimestamp(admin.createdAt)
     };
   },

@@ -3,12 +3,13 @@ import { dateToTimestamp } from './utils';
 
 /**
  * @typedef {Object} User
- * @property {string} id - Firebase Auth UID
+ * @property {string} id 
  * @property {string} username
  * @property {string} email
  * @property {string} [fullName]
  * @property {string} [phone]
  * @property {boolean} isActive
+ * @property {boolean} isEmergencyUser
  * @property {Date} createdAt
  * @property {Date} [lastLogin]
  */
@@ -21,6 +22,7 @@ const userConverter = {
       fullName: user.fullName || null,
       phone: user.phone || null,
       isActive: user.isActive,
+      isEmergencyUser: user.isEmergencyUser || false,
       createdAt: dateToTimestamp(user.createdAt),
       lastLogin: dateToTimestamp(user.lastLogin)
     };
@@ -34,6 +36,7 @@ const userConverter = {
       fullName: data.fullName,
       phone: data.phone,
       isActive: data.isActive,
+      isEmergencyUser: data.isEmergencyUser || false,
       createdAt: data.createdAt?.toDate(),
       lastLogin: data.lastLogin?.toDate()
     };
