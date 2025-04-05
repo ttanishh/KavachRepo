@@ -9,11 +9,22 @@ import { dateToTimestamp } from './utils';
  * @property {string} [description]
  * @property {Date} [occurredAt]
  * @property {Date} reportedAt
- * @property {string} status - 'new' | 'in_review' | 'assigned' | 'resolved' | 'closed'
+ * @property {CrimeReportStatus} status
  * @property {{lat: number, lng: number}} location
  * @property {string[]} [mediaUrls]
  * @property {Date} createdAt
  */
+
+/**
+ * @enum {string}
+ */
+const CrimeReportStatus = {
+  NEW: 'new',
+  IN_REVIEW: 'in_review',
+  ASSIGNED: 'assigned',
+  RESOLVED: 'resolved',
+  CLOSED: 'closed'
+};
 
 const crimeReportConverter = {
   toFirestore: (report) => {

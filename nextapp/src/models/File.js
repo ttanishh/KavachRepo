@@ -6,7 +6,6 @@ import { dateToTimestamp } from './utils';
  * @property {string} id
  * @property {string} userId
  * @property {string} reportId
- * @property {string} roleInCase - 'reporter' | 'victim' | 'witness' | 'other'
  * @property {Date} notedAt
  */
 
@@ -15,7 +14,6 @@ const fileConverter = {
     return {
       userId: file.userId,
       reportId: file.reportId,
-      roleInCase: file.roleInCase,
       notedAt: dateToTimestamp(file.notedAt)
     };
   },
@@ -25,7 +23,6 @@ const fileConverter = {
       id: snapshot.id,
       userId: data.userId,
       reportId: data.reportId,
-      roleInCase: data.roleInCase,
       notedAt: data.notedAt?.toDate()
     };
   }

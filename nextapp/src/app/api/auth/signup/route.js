@@ -16,7 +16,7 @@ export async function POST(request) {
       username, 
       phone, 
       role,
-      isEmergencyUser = false // Flag for emergency signup
+      isEmergencyUser = false
     } = await request.json();
 
     // Basic validation
