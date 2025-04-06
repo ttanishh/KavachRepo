@@ -26,7 +26,7 @@ Kavach is a comprehensive crime reporting and management system that enables cit
 
 - **Super Admin Features**
   - Manage police stations
-  - Manage system users
+  --/ Manage system users
   - View system-wide analytics
   - Generate reports
   - Configure system settings
@@ -47,6 +47,17 @@ Kavach is a comprehensive crime reporting and management system that enables cit
   - Mongoose
   - JWT Authentication
   - AWS S3 (for file storage)
+
+##Future Scope
+
+1. Integrate Deepfake detection model (endpoints for this are already setup in mlserver/app.py) while uploading image from users end to make legitimate request get more priority from authorities.
+2. Extend multilingual support to the chrome extension as well as web apps
+3. Transition the application to a progressive web application
+4. Scale the application to support nationwide data (Our current prototype assumes only Gujarats data)
+5. Inculcate more intricate and complex hierarchy on authority end (currently we have assumed superadmin(head person of state) and admins(head people of districts) only)
+6. Implement a mechanism for scheduling tasks by superadmin between admins
+7. Set up some incentive mechanism to utilize the points earned by users via our web extension
+8. Improve UI
 
 ## Getting Started
 
@@ -91,4 +102,9 @@ Kavach is a comprehensive crime reporting and management system that enables cit
 - [MongoDB](https://www.mongodb.com/)
 - [Leaflet](https://leafletjs.com/)
 - [Recharts](https://recharts.org/)
+
+## Team Kavach
+Aayudh Panchal - https://www.linkedin.com/in/aayudh-panchal/
+Misbah Shaikh - https://www.linkedin.com/in/misbahsrshaikh/
+Tanish Panchal - https://www.linkedin.com/in/tanish2311/
 
