@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kavach</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Leaflet Heat plugin -->
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Kavach</h1>
+      <p>Your first step towards shielding your safety</p>
+    </header>
+    
+    <div class="tab-container">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="dashboard">Dashboard</button>
+        <button class="tab-button" data-tab="simplify">Simplify it</button>
+        <button class="tab-button" data-tab="quiz">Quiz</button>
+      </div>
+      
+      <div id="dashboard" class="tab-content active">
+        <div class="summary-card">
+          <h2>Hi Misbah!</h2>
+          <div class="summary-stats">
+            <div class="stat">
+              <span class="stat-label" id="location-label">Your Kavach Points </span>
+              <!-- Removed inline script - moved to JS file -->
+              <span class="stat-value" id="score-display">--</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">You are a Kavach</span>
+              <span class="stat-value" id="docs-count">PRO</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Heatmap</span>
+              
+              <span class="stat-value" id="deduction-count"> </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="action-card">
+          <h3>Next Steps to Earn more Kavach Points</h3>
+          <ul id="action-items" class="action-list">
+            <li class="action-item">
+              <a href="https://cybercrime.gov.in/" target="_blank">Visit the National Cybercrime portal regularly</a>
+            </li>
+            <li class="action-item">
+              <a href="https://www.who.int/mental_health/en/" target="_blank">Take Care of your Mental Health</a>
+            </li>
+            <li class="action-item">
+              <a href="https://kavach.gov.in/" target="_blank">Use Kavach Web App to Report Crime in Realtime</a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Added location info tooltip container -->
+        <div id="location-tooltip" class="tooltip"></div>
+      </div>
+      
+      <!-- Rest of the HTML remains unchanged -->
+      <div id="simplify" class="tab-content">
+          <h3>Selected Text:</h3>
+      <div id="selectedText" class="text-container">No text selected</div>
+      <div id="error" class="error"></div>
+      <button id="clearBtn" class="button">Clear Selection</button>
+      
+      <h3>Simplified Version:</h3>
+      <div id="simplifiedText" class="text-container">No text selected</div>
+      
+      <div class="chat-interface">
+          <h3>Ask a Question:</h3>
+          <div class="input-group">
+              <input type="text" id="promptText" placeholder="Ask something about the selected text...">
+              <button id="submitBtn" class="button">Submit</button>
+          </div>
+          <div id="outputDisplay" class="text-container">Response will appear here...</div>
+      </div>
+      </div>
+      
+      <div id="quiz" class="tab-content">
+      <div class="quiz-card">
+        <h3>The Kavach of an Aware Citizen</h3>
+        <p>How well do you know your rights?</p>
+        
+        <div id="quiz-container" class="quiz-container">
+          <div id="scenario-description"></div>
+          <ul id="quiz-options"></ul>
+          <div id="quiz-feedback" class="feedback"></div>
+          <button id="next-scenario" class="primary-button" style="display: none;">Next Scenario</button>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
