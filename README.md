@@ -5,8 +5,8 @@
 Kavach is a comprehensive crime reporting and management system that enables citizens to report crimes, allows police stations to manage cases, and provides super admins with system-wide analytics and control.
 
 ## Demo Video
-[Click here to watch the demo video](https://drive.google.com/drive/folders/1uY3xP98sihjHD2VmgtS2jzS0zf2wi5iI?usp=sharing)
-[Click here to access the ppt](https://www.canva.com/design/DAGj1Rn16MA/yBX94GOoEq8jueJPh0KciQ/edit?utm_content=DAGj1Rn16MA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+- [Click here to watch the demo video](https://drive.google.com/drive/folders/1uY3xP98sihjHD2VmgtS2jzS0zf2wi5iI?usp=sharing)
+- [Click here to access the ppt](https://www.canva.com/design/DAGj1Rn16MA/yBX94GOoEq8jueJPh0KciQ/edit?utm_content=DAGj1Rn16MA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## Features
 
