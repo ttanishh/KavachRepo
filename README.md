@@ -104,7 +104,7 @@ Kavach is a comprehensive crime reporting and management system that enables cit
 - [Recharts](https://recharts.org/)
 
 ## Team Kavach
-Aayudh Panchal - https://www.linkedin.com/in/aayudh-panchal/
-Misbah Shaikh - https://www.linkedin.com/in/misbahsrshaikh/
-Tanish Panchal - https://www.linkedin.com/in/tanish2311/
+- Aayudh Panchal - https://www.linkedin.com/in/aayudh-panchal/
+- Misbah Shaikh - https://www.linkedin.com/in/misbahsrshaikh/
+- Tanish Panchal - https://www.linkedin.com/in/tanish2311/
 
