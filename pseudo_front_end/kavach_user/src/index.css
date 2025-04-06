@@ -1,0 +1,122 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 195 33% 99%;
+    --foreground: 195 30% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 195 30% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 195 30% 15%;
+
+    --primary: 195 100% 30%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 195 40% 96%;
+    --secondary-foreground: 195 30% 15%;
+
+    --muted: 195 40% 96%;
+    --muted-foreground: 195 30% 45%;
+
+    --accent: 195 40% 96%;
+    --accent-foreground: 195 30% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 195 20% 90%;
+    --input: 195 20% 90%;
+    --ring: 195 100% 30%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 195 30% 9%;
+    --foreground: 195 5% 90%;
+
+    --card: 195 30% 12%;
+    --card-foreground: 195 5% 90%;
+
+    --popover: 195 30% 12%;
+    --popover-foreground: 195 5% 90%;
+
+    --primary: 195 100% 40%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 195 30% 15%;
+    --secondary-foreground: 195 5% 90%;
+
+    --muted: 195 30% 15%;
+    --muted-foreground: 195 20% 65%;
+
+    --accent: 195 30% 15%;
+    --accent-foreground: 195 5% 90%;
+
+    --destructive: 0 62.8% 40.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 195 30% 20%;
+    --input: 195 30% 20%;
+    --ring: 195 100% 40%;
+    
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.mapboxgl-map {
+  @apply rounded-lg shadow-md;
+}
+
+.map-container {
+  @apply w-full h-[70vh] lg:h-[80vh];
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.crime-pin {
+  @apply w-6 h-6 bg-alert rounded-full flex items-center justify-center text-white border-2 border-white shadow-md;
+}
+
+.pulse {
+  @apply absolute w-12 h-12 bg-alert/20 rounded-full animate-ping;
+}
