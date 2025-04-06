@@ -1,36 +1,25 @@
 // components/common/Badge.jsx
 import React from 'react';
+import { cn } from '@/lib/utils';
 
-export function Badge({
-  children,
-  variant = 'default',
-  status,
-  className = '',
-  ...props
-}) {
-  const variants = {
-    default: 'bg-surface-100 text-surface-700',
-    primary: 'bg-primary-100 text-primary-700',
-    secondary: 'bg-secondary-100 text-secondary-700',
-    success: 'bg-success-50 text-success-500', 
-    warning: 'bg-warning-50 text-warning-500',
-    error: 'bg-error-50 text-error-500',
-    info: 'bg-info-50 text-info-500',
+export function Badge({ children, variant = 'default', className = '', ...props }) {
+  const variantStyles = {
+    default: 'bg-surface-100 text-surface-800',
+    primary: 'bg-primary-100 text-primary-800',
+    secondary: 'bg-secondary-100 text-secondary-800',
+    success: 'bg-success-100 text-success-800',
+    warning: 'bg-warning-100 text-warning-800',
+    error: 'bg-error-100 text-error-800',
+    info: 'bg-info-100 text-info-800',
   };
-  
-  const statusVariants = {
-    new: 'bg-info-50 text-info-500',
-    in_review: 'bg-secondary-100 text-secondary-700',
-    assigned: 'bg-warning-50 text-warning-500',
-    resolved: 'bg-success-50 text-success-500',
-    closed: 'bg-surface-200 text-surface-700',
-  };
-  
-  const variantClass = status ? statusVariants[status] : variants[variant];
   
   return (
     <span 
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variantClass} ${className}`}
+      className={cn(
+        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+        variantStyles[variant],
+        className
+      )}
       {...props}
     >
       {children}

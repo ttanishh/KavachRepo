@@ -1,44 +1,39 @@
 // components/common/Input.jsx
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 export function Input({
-  label,
-  id,
-  error,
-  helperText,
-  type = 'text',
   className = '',
+  type = 'text',
+  error,
+  label,
+  helperText,
   ...props
 }) {
   return (
-    <div className="space-y-1 w-full">
+    <div className="w-full">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-surface-700">
+        <label className="block text-sm font-medium text-surface-700 mb-1">
           {label}
         </label>
       )}
       <input
-        id={id}
         type={type}
-        className={`
-          w-full px-3 py-2 bg-surface-50 border rounded-md
-          ${error ? 'border-error-500 focus:ring-error-500' : 'border-surface-300 focus:ring-primary-500'}
-          focus:outline-none focus:ring-2 focus:ring-opacity-20
-          disabled:bg-surface-100 disabled:text-surface-500
-          ${className}
-        `}
-        aria-invalid={error ? "true" : "false"}
-        aria-describedby={error ? `${id}-error` : helperText ? `${id}-description` : undefined}
+        className={cn(
+          "block w-full rounded-md border bg-white px-3 py-2 text-surface-700 shadow-sm transition-colors sm:text-sm",
+          error 
+            ? "border-error-300 focus:border-error-500 focus:ring-error-500" 
+            : "border-surface-200 focus:border-primary-500 focus:ring-primary-500",
+          className
+        )}
         {...props}
       />
-      {error && (
-        <p id={`${id}-error`} className="text-xs text-error-500 mt-1">
-          {error}
-        </p>
-      )}
-      {helperText && !error && (
-        <p id={`${id}-description`} className="text-xs text-surface-500 mt-1">
-          {helperText}
+      {(error || helperText) && (
+        <p className={cn(
+          "mt-1 text-sm",
+          error ? "text-error-600" : "text-surface-500"
+        )}>
+          {error || helperText}
         </p>
       )}
     </div>

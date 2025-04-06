@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { db, getDoc } from '@/lib/firebase';  // Add getDoc to imports
-import { userDoc, users } from '@/models/User';
-import { adminDoc } from '@/models/Admin';
-import { superAdminDoc } from '@/models/SuperAdmin';
+import { db, getDoc } from '@/lib/firebase';  // Use @ alias
+import { userDoc, users } from '@/models/User';  // Use @ alias
+import { adminDoc } from '@/models/Admin';  // Use @ alias
+import { superAdminDoc } from '@/models/SuperAdmin';  // Use @ alias
 import { collection, getDocs, query, where, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { generateToken } from '@/lib/jwt';
+import { generateToken } from '@/lib/jwt';  // Use @ alias
 
 export async function POST(request) {
   try {
